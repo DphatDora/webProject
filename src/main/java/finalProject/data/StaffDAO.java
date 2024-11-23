@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class StaffDAO {
 
+    //hàm lấy NV bằng ID
     public static Staff getStaffById(String staffId) {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         try{
@@ -26,6 +27,7 @@ public class StaffDAO {
         }
     }
 
+    //hàm thêm NV
     public static void insert(Staff staff) {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         EntityTransaction trans = em.getTransaction();
@@ -45,6 +47,7 @@ public class StaffDAO {
         }
     }
 
+    //hàm update NV
     public static void update(Staff staff) {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         EntityTransaction trans = em.getTransaction();
@@ -60,6 +63,7 @@ public class StaffDAO {
         }
     }
 
+    //hàm xóa NV
     public static void delete(Staff staff) {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         EntityTransaction trans = em.getTransaction();
@@ -75,35 +79,14 @@ public class StaffDAO {
         }
     }
 
+    //hàm lấy tất cả NV
     public static List<Staff> getAllStaffs() {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         String query = "SELECT s FROM Staff s";
         return em.createQuery(query, Staff.class).getResultList();
     }
 
-    public static List<Staff> getStaffByName(String name) {
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        String query = "SELECT s FROM Staff s where s.name like :name";
-        return em.createQuery(query, Staff.class).setParameter("name", "%" + name + "%").getResultList();
-    }
-
-    public static List<Staff> getStaffByFilters(double salaryMin, double salaryMax, int ageMin, int ageMax, int workTimeMin, int workTimeMax) {
-
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        String query = "Select s From Staff s " +
-                        "Where function('year', current_date) - function('year', s.birthDate) between :ageMin and :ageMax " +
-                        "and function('year', current_date) - function('year', s.workDate) between :workTimeMin and :workTimeMax " +
-                        "and s.salary between :salaryMin and :salaryMax ";
-
-        return em.createQuery(query, Staff.class)
-                .setParameter("ageMin", ageMin)
-                .setParameter("ageMax", ageMax)
-                .setParameter("workTimeMin", workTimeMin)
-                .setParameter("workTimeMax", workTimeMax)
-                .setParameter("salaryMin", salaryMin)
-                .setParameter("salaryMax", salaryMax).getResultList();
-    }
-
+    //hàm tính số NV của mỗi ca
     public static int StaffPerShift(LocalDate date, String shiftName){
         Date shiftDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
@@ -115,6 +98,7 @@ public class StaffDAO {
         return count.intValue();
     }
 
+    //hàm lấy Map<ca ngày, số NV ca đó>
     public static Map<LocalDate, Integer> getStaffPerShiftInMonth(String shiftName, int month, int year) {
 
         Map<LocalDate, Integer> map = new HashMap<>();
@@ -126,21 +110,7 @@ public class StaffDAO {
         return map;
     }
 
-    public static boolean isOverShifts(Staff staff, int month, int year) {
-            EntityManager em = DBUtil.getEmFactory().createEntityManager();
-            String query = "SELECT COUNT(shift) FROM Staff s JOIN s.listShift shift " +
-                    "WHERE s.personID = :staffId " +
-                    "AND FUNCTION('MONTH', shift.shiftDate) = :month " +
-                    "AND FUNCTION('YEAR', shift.shiftDate) = :year";
-            Long shiftCount = em.createQuery(query, Long.class)
-                    .setParameter("staffId", staff.getPersonID())
-                    .setParameter("month", month)
-                    .setParameter("year", year)
-                    .getSingleResult();
-            return shiftCount > 15;
-        }
-
-
+    //hàm kiểm tra nhân viên tồn tại hay chưa
     public static boolean isExisted(String name, String phone){
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         String query = "Select Count(s) From Staff s where s.name = :name and s.phone = :phone";
@@ -151,6 +121,7 @@ public class StaffDAO {
         return empCount > 0;
     }
 
+    //hàm láy các ca làm của 1 NV trong tháng
     public static List<Shift> getShiftInMonth(Staff staff, int month, int year) {
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
         String query = "Select shift From Staff s Join s.listShift shift Where s.personID = :staffId " +
@@ -161,13 +132,7 @@ public class StaffDAO {
                 setParameter("month", month).getResultList();
     }
 
-    public static int getTotalShift(Staff staff) {
-        EntityManager em = DBUtil.getEmFactory().createEntityManager();
-        String query = "select count(shift) from Staff s join s.listShift shift Where s.personID = :staffId";
-        Long count = em.createQuery(query, Long.class).setParameter("staffId", staff.getPersonID()).getSingleResult();
-        return count.intValue();
-    }
-
+    //hàm lấy danh sách NV mỗi ca làm việc
     public static List<Staff> getStaffInShift(LocalDate date, String shiftName) {
         Date shiftDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
         EntityManager em = DBUtil.getEmFactory().createEntityManager();
