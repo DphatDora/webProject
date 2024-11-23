@@ -1,0 +1,29 @@
+.table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table th, .table td {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: center;
+    vertical-align: top;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table-info {
+    background-color: #e9f7fd;
+    min-width: 100px;
+}
+
+td {
+    min-height: 100px;
+}
+
+.table td input[type="checkbox"] {
+    margin-top: 5px;
+}
